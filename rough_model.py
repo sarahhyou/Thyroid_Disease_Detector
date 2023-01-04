@@ -22,7 +22,7 @@ thyroid_features, X_test, thyroid_result, Y_test = train_test_split(thyroid_df.d
 
 # Further split up non-testing set into training and validation sets
 
-X_train, Y_train, X_val, Y_val = train_test_split(thyroid_features, thyroid_result, test_size= .1, random_state= 123)
+X_train, X_val, Y_train, Y_val = train_test_split(thyroid_features, thyroid_result, test_size= .1, random_state= 123)
 
 # Before we employ oversampling, the dataset contains a lot of a. missing points and b. categorical variables that need to be preprocessed.
 # 1. Missing Data
@@ -62,9 +62,31 @@ X_train_num = pd.DataFrame(mice_imputer.fit_transform(X_train_num), columns = nu
 # Considering that women are more at risk of thyroid issues than men, more women are likely to be surveyed for this dataset
 
 X_train_cat['sex'] = X_train_cat['sex'].fillna('F')
-print(X_train_cat.isna().sum())
 
 # Transform categorical variables
 
+X_train_cat_onehot = pd.get_dummies(X_train_cat, columns = categorical_cols)
+
+# Join numerical and categorical sub dataframes together and overwrite original dataframe
+
+X_train_num.index = X_train_cat.index
+X_train = pd.concat([X_train_num, X_train_cat], axis = 1)
+X_train_one = pd.concat([X_train_num, X_train_cat_onehot], axis = 1)
+
+# Now the data has been properly preprocessed and ready for sample and feature selection.
 # 1. Random oversampling method:
 # import packages
+
+from imblearn.over_sampling import RandomOverSampler
+
+random_os = RandomOverSampler(sampling_strategy = 0.3) # we just want minority (hypothyroid) class to appear more often
+# oversampling minority class until it equals majority class can lead to model overfitting
+X_train_rand, Y_train_rand = random_os.fit_resample(X_train_one, Y_train)
+
+# 2. SMOTE oversampling method:
+
+from imblearn.over_sampling import SMOTENC
+
+smote_os = SMOTENC(categorical_features= [6,7,8,9], random_state = 123, sampling_strategy= 0.3) # categorical data in last 4 columns 
+X_train_smote, Y_train_smote = smote_os.fit_resample(X_train, Y_train)
+X_train_smote = pd.get_dummies(X_train_smote, columns = categorical_cols)

@@ -17,12 +17,8 @@ thyroid_df['thyroid_class'].replace(['hypothyroid', 'negative'], [1,0], inplace=
 
 from sklearn.model_selection import train_test_split
 
-thyroid_features, X_test, thyroid_result, Y_test = train_test_split(thyroid_df.drop(['thyroid_class'], axis= 1),
-    thyroid_df['thyroid_class'], test_size = .1, random_state = 123)
-
-# Further split up non-testing set into training and validation sets
-
-X_train, X_val, Y_train, Y_val = train_test_split(thyroid_features, thyroid_result, test_size= .1, random_state= 123)
+X_train, X_test, Y_train, Y_test = train_test_split(thyroid_df.drop(['thyroid_class'], axis= 1),
+    thyroid_df['thyroid_class'], test_size = .3, random_state = 123)
 
 # Before we employ oversampling, the dataset contains a lot of a. missing points and b. categorical variables that need to be preprocessed.
 
@@ -37,18 +33,15 @@ X_train_smote, Y_train_smote = rough_oversampler.rough_oversampler_smote(X_train
 # Preprocessing done! Time to model the datasets:
 # There are three general categories of classification models we can use: Traditional Classification, Artificial NN, and Gradient Boosting
 
-# 1. For Traditional Classification we can test Naive Bayes:
+# 1. For Traditional Classification we can test Logistic Regression:
 
 # Implementation: 
 
-from sklearn.linear_model import LogisticRegression
+import rough_model_trainer
 
-trad_model = LogisticRegression()
-trad_model.fit(X_train_rand, Y_train_rand)
-trad_model_2 = LogisticRegression()
-trad_model_2.fit(X_train_smote, Y_train_smote)
+trad_model, trad_model_2 = rough_model_trainer.logistic_classifier(X_train_rand, Y_train_rand, X_train_smote, Y_train_smote)
 
-# 2. For Artificial Neural Networks we can test Multilayer Perceptron and standard ANN:
+# 2. For Artificial Neural Networks we can test Multilayer Perceptron:
 
 # 3. For Gradient Boosting LightGBM reports to have good results: 
 
@@ -57,4 +50,7 @@ trad_model_2.fit(X_train_smote, Y_train_smote)
 # Logistic Regression:
 
 import rough_validate
-rough_validate.rough_validate(X_val, Y_val, trad_model, trad_model_2)
+rough_validate.rough_validate(X_test, Y_test, trad_model, trad_model_2)
+crossval_1 = rough_validate.crossval(trad_model, X_train_rand, Y_train_rand)
+crossval_2 = rough_validate.crossval(trad_model_2, X_train_smote, Y_train_smote)
+print(rough_validate.model_comp(crossval_1, crossval_2))

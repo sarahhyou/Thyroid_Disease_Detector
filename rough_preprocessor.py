@@ -37,6 +37,10 @@ def rough_preprocessor (x):
 # Considering that women are more at risk of thyroid issues than men, more women are likely to be surveyed for this dataset
     
     x_cat['sex'] = x_cat['sex'].fillna('F')
+
+# normalize quantitative variables (except age):
+
+    
     
 # Transform categorical variables
     

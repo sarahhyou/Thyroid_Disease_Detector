@@ -47,5 +47,4 @@ def rough_preprocessor (x):
     x_num.index = x_cat.index
     x = pd.concat([x_num, x_cat_onehot], axis = 1)
     x_for_smote = pd.concat([x_num, x_cat], axis = 1)
-
-    return(x, x_for_smote, categorical_cols)
+    return (x, x_for_smote, categorical_cols)

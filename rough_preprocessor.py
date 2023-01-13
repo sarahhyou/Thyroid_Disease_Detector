@@ -1,7 +1,7 @@
 import numpy as np, pandas as pd, rough_oversampler
 from sklearn.experimental import enable_iterative_imputer # Must keep this line to enable MICE Imputer
 from sklearn.impute import IterativeImputer
-from sklearn import linear_model
+from sklearn import linear_model, preprocessing
 def rough_preprocessor (x):
 
 # 1. Missing Data
@@ -40,7 +40,8 @@ def rough_preprocessor (x):
 
 # normalize quantitative variables (except age):
 
-    
+    cols_tonorm = ['TSH','T3','TT4','T4U','FTI']
+    x_num[cols_tonorm] = x_num[cols_tonorm].apply(lambda x: (x - x.median())/(x.quantile(0.75)-x.quantile(0.25)))
     
 # Transform categorical variables
     

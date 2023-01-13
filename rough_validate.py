@@ -1,4 +1,4 @@
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, roc_auc_score
 from sklearn.model_selection import StratifiedKFold, cross_val_score
 from scipy.stats import wilcoxon
 import rough_preprocessor

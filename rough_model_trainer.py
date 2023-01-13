@@ -7,4 +7,5 @@ def logistic_classifier (x1, y1, x2, y2):
     return(model_1, model_2)
 
 def mlp_classifier (x1, y1, x2, y2):
-    import keras
+    import tensorflow as tf
+    s = tf.InteractiveSession()

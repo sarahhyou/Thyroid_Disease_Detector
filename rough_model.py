@@ -1,5 +1,8 @@
 import pandas as pd
 import numpy as np
+import warnings 
+
+warnings.filterwarnings("ignore")
 
 # import csv dataset
 thyroid_df = pd.read_csv('hypothyroid_ver2.csv')
@@ -45,12 +48,18 @@ trad_model, trad_model_2 = rough_model_trainer.logistic_classifier(X_train_rand,
 
 # 3. For Gradient Boosting LightGBM reports to have good results: 
 
-# Validation:
+grad_model, grad_model_2 = rough_model_trainer.lgbt_classifier(X_train_rand, Y_train_rand, X_train_smote, Y_train_smote)
 
-# Logistic Regression:
+# Model comparison:
+
+# Random oversampling vs. SMOTE oversampling:
 
 import rough_validate
-rough_validate.rough_validate(X_test, Y_test, trad_model, trad_model_2)
-crossval_1 = rough_validate.crossval(trad_model, X_train_rand, Y_train_rand)
-crossval_2 = rough_validate.crossval(trad_model_2, X_train_smote, Y_train_smote)
-print(rough_validate.model_comp(crossval_1, crossval_2))
+
+# Logistic Regression: 
+
+rough_validate.better_model(trad_model, X_train_rand, Y_train_rand, trad_model_2, X_train_smote, Y_train_smote)
+
+# LightGBM:
+
+rough_validate.better_model(grad_model, X_train_rand, Y_train_rand, grad_model_2, X_train_smote, Y_train_smote)

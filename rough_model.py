@@ -26,12 +26,13 @@ X_train, X_test, Y_train, Y_test = train_test_split(thyroid_df.drop(['thyroid_cl
 # Before we employ oversampling, the dataset contains a lot of a. missing points and b. categorical variables that need to be preprocessed.
 
 import rough_preprocessor, rough_oversampler
-X_train, X_train_smote, catcols = rough_preprocessor.rough_preprocessor(X_train)
+X_train, X_train_no_onehot, catcols = rough_preprocessor.rough_preprocessor(X_train)
 
 # Now the data has been properly preprocessed and ready for sample selection.
 
 X_train_rand, Y_train_rand = rough_oversampler.rough_oversampler_random(X_train, Y_train)
-X_train_smote, Y_train_smote = rough_oversampler.rough_oversampler_smote(X_train_smote, Y_train, catcols)
+X_train_smote, Y_train_smote = rough_oversampler.rough_oversampler_smote(X_train_no_onehot, Y_train, catcols)
+X_train_NN, Y_train_NN = rough_oversampler.rough_oversampler_random(X_train_no_onehot, Y_train)
 
 # Preprocessing done! Time to model the datasets:
 # There are three general categories of classification models we can use: Traditional Classification, Artificial NN, and Gradient Boosting
@@ -45,6 +46,10 @@ import rough_model_trainer
 trad_model, trad_model_2 = rough_model_trainer.logistic_classifier(X_train_rand, Y_train_rand, X_train_smote, Y_train_smote)
 
 # 2. For Artificial Neural Networks we can test Multilayer Perceptron:
+
+import mlp_pipelines
+train_ds = mlp_pipelines.df_to_dataset(X_train_NN, Y_train_NN)
+print(train_ds)
 
 # 3. For Gradient Boosting LightGBM reports to have good results: 
 

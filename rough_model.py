@@ -9,7 +9,7 @@ thyroid_df = pd.read_csv('hypothyroid_ver2.csv')
 
 # check composition of dataset (number of sick cases vs. non-sick cases)
 percent_sick = thyroid_df.thyroid_class.value_counts()['hypothyroid']/len(thyroid_df.index) * 100
-print(thyroid_df.sick.value_counts(), f"{percent_sick:.3}%")
+print(thyroid_df.thyroid_class.value_counts(), f"{percent_sick:.3}%")
 
 #(Probably bad practice but idc) Convert the outcome (thyroid_class) into numeric variables
 thyroid_df['thyroid_class'].replace(['hypothyroid', 'negative'], [1,0], inplace= True)
@@ -49,22 +49,29 @@ trad_model, trad_model_2 = rough_model_trainer.logistic_classifier(X_train_rand,
 
 import mlp_pipelines
 train_ds = mlp_pipelines.df_to_dataset(X_train_NN, Y_train_NN)
-print(train_ds)
+catcols = ['sex', 'pregnant', 'sick', 'tumor']
+numcols = ['TSH', 'T3', 'TT4', 'T4U', 'FTI']
 
-# 3. For Gradient Boosting LightGBM reports to have good results: 
+mlp_pipelines.add_crossed_layers(X_train_NN, train_ds)
+#mlp_pipelines.encode_cat_layers(catcols, train_ds)
+#mlp_pipelines.encode_num_layers(numcols)
+#print(mlp_pipelines.get_layers())
 
-grad_model, grad_model_2 = rough_model_trainer.lgbt_classifier(X_train_rand, Y_train_rand, X_train_smote, Y_train_smote)
 
-# Model comparison:
-
-# Random oversampling vs. SMOTE oversampling:
-
-import rough_validate
-
-# Logistic Regression: 
-
-rough_validate.better_model(trad_model, X_train_rand, Y_train_rand, trad_model_2, X_train_smote, Y_train_smote)
-
-# LightGBM:
-
-rough_validate.better_model(grad_model, X_train_rand, Y_train_rand, grad_model_2, X_train_smote, Y_train_smote)
+## 3. For Gradient Boosting LightGBM reports to have good results: 
+#
+#grad_model, grad_model_2 = rough_model_trainer.lgbt_classifier(X_train_rand, Y_train_rand, X_train_smote, Y_train_smote)
+#
+## Model comparison:
+#
+## Random oversampling vs. SMOTE oversampling:
+#
+#import rough_validate
+#
+## Logistic Regression: 
+#
+#rough_validate.better_model(trad_model, X_train_rand, Y_train_rand, trad_model_2, X_train_smote, Y_train_smote)
+#
+## LightGBM:
+#
+#rough_validate.better_model(grad_model, X_train_rand, Y_train_rand, grad_model_2, X_train_smote, Y_train_smote)

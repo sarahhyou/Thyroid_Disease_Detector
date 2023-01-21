@@ -5,7 +5,7 @@ from imblearn.over_sampling import RandomOverSampler
 from imblearn.over_sampling import SMOTENC
 
 def rough_oversampler_random (x, y):
-    random_os = RandomOverSampler(sampling_strategy = 0.3) # we just want minority (hypothyroid) class to appear more often
+    random_os = RandomOverSampler(sampling_strategy = 0.3, random_state = 123) # we just want minority (hypothyroid) class to appear more often
     # oversampling minority class until it equals majority class can lead to model overfitting
     x_rand, y_rand = random_os.fit_resample(x, y)
     return (x_rand, y_rand)

@@ -27,20 +27,28 @@ def add_cat_encoding_layer(name, ds, dtype, max_tokens = None):
 all_inputs = []
 encoded_features = []
 
+def add_crossed_layers(df, ds):
+  c1 = tf.constant(df['sex'])
+  c2 = tf.constant(df['pregnant'])
+  layer = tf.keras.layers.experimental.preprocessing.HashedCrossing(num_bins = 2, output_mode = 'one_hot')
+  #np_layer = tf.make_ndarray(layer)
+  #keras_layer = tf.keras.Input(shape=(1,), name='sex_cross_pregnancy')
+  ds.append(layer((c1, c2)))
+  print(ds) #TODO: try convert to nparray > add to df > convert df to ds > add keras layer as numerical layer?
+
 def encode_cat_layers(catcols, ds):
   for header in catcols:
     categorical_col = tf.keras.Input(shape=(1,), name=header, dtype='string')
-    encoding_layer = add_cat_encoding_layer(name=header, dataset=ds, dtype='string', max_tokens=2)
+    encoding_layer = add_cat_encoding_layer(name=header, ds = ds, dtype='string', max_tokens=2)
     encoded_categorical_col = encoding_layer(categorical_col)
     all_inputs.append(categorical_col)
     encoded_features.append(encoded_categorical_col)
 
-def add_num_encoding_layers(numcols):
+def encode_num_layers(numcols):
   for header in numcols:
     numeric_col = tf.keras.Input(shape=(1,), name=header)
     all_inputs.append(numeric_col)
-    encoded_features.append(numeric_col)
 
-def check_layers(a, e):
-  print(a, e)
+def get_layers():
+  return (all_inputs, encoded_features)
 

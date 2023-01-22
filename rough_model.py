@@ -32,7 +32,6 @@ X_train, X_train_no_onehot, catcols = rough_preprocessor.rough_preprocessor(X_tr
 
 X_train_rand, Y_train_rand = rough_oversampler.rough_oversampler_random(X_train, Y_train)
 X_train_smote, Y_train_smote = rough_oversampler.rough_oversampler_smote(X_train_no_onehot, Y_train, catcols)
-X_train_NN, Y_train_NN = rough_oversampler.rough_oversampler_random(X_train_no_onehot, Y_train)
 
 # Preprocessing done! Time to model the datasets:
 # There are three general categories of classification models we can use: Traditional Classification, Artificial NN, and Gradient Boosting
@@ -47,31 +46,27 @@ trad_model, trad_model_2 = rough_model_trainer.logistic_classifier(X_train_rand,
 
 # 2. For Artificial Neural Networks we can test Multilayer Perceptron:
 
-import mlp_pipelines
-train_ds = mlp_pipelines.df_to_dataset(X_train_NN, Y_train_NN)
-catcols = ['sex', 'pregnant', 'sick', 'tumor']
-numcols = ['TSH', 'T3', 'TT4', 'T4U', 'FTI']
+mlp_test, mlp_model, mlp_test_2, mlp_model_2 = rough_model_trainer.mlp_classifier(
+    X_train_rand, Y_train_rand, X_train_smote, Y_train_smote)
 
-mlp_pipelines.add_crossed_layers(X_train_NN, train_ds)
-#mlp_pipelines.encode_cat_layers(catcols, train_ds)
-#mlp_pipelines.encode_num_layers(numcols)
-#print(mlp_pipelines.get_layers())
+# 3. For Gradient Boosting LightGBM reports to have good results: 
 
+grad_model, grad_model_2 = rough_model_trainer.lgbt_classifier(X_train_rand, Y_train_rand, X_train_smote, Y_train_smote)
 
-## 3. For Gradient Boosting LightGBM reports to have good results: 
-#
-#grad_model, grad_model_2 = rough_model_trainer.lgbt_classifier(X_train_rand, Y_train_rand, X_train_smote, Y_train_smote)
-#
-## Model comparison:
-#
-## Random oversampling vs. SMOTE oversampling:
-#
-#import rough_validate
-#
-## Logistic Regression: 
-#
-#rough_validate.better_model(trad_model, X_train_rand, Y_train_rand, trad_model_2, X_train_smote, Y_train_smote)
-#
-## LightGBM:
-#
-#rough_validate.better_model(grad_model, X_train_rand, Y_train_rand, grad_model_2, X_train_smote, Y_train_smote)
+# Model comparison:
+
+# Random oversampling vs. SMOTE oversampling:
+
+import rough_validate
+
+# Logistic Regression: 
+
+rough_validate.better_model(trad_model, X_train_rand, Y_train_rand, trad_model_2, X_train_smote, Y_train_smote)
+
+# MLP:
+
+#rough_validate.better_model(mlp_test, X_train_rand, Y_train_rand, mlp_test_2, X_train_smote, Y_train_smote)
+
+# LightGBM:
+
+rough_validate.better_model(grad_model, X_train_rand, Y_train_rand, grad_model_2, X_train_smote, Y_train_smote)

@@ -46,7 +46,7 @@ trad_model, trad_model_2 = rough_model_trainer.logistic_classifier(X_train_rand,
 
 # 2. For Artificial Neural Networks we can test Multilayer Perceptron:
 
-mlp_test, mlp_model, mlp_test_2, mlp_model_2 = rough_model_trainer.mlp_classifier(
+mlp_model, mlp_model_2 = rough_model_trainer.mlp_classifier(
     X_train_rand, Y_train_rand, X_train_smote, Y_train_smote)
 
 # 3. For Gradient Boosting LightGBM reports to have good results: 
@@ -55,18 +55,27 @@ grad_model, grad_model_2 = rough_model_trainer.lgbt_classifier(X_train_rand, Y_t
 
 # Model comparison:
 
-# Random oversampling vs. SMOTE oversampling:
-
+## Random oversampling vs. SMOTE oversampling:
+#
 import rough_validate
+#
+## Logistic Regression: 
+#
+#rough_validate.better_model(trad_model, X_train_rand, Y_train_rand, trad_model_2, X_train_smote, Y_train_smote)
+#
+## MLP:
+#
+#rough_validate.better_model(mlp_model, X_train_rand, Y_train_rand, mlp_model_2, X_train_smote, Y_train_smote)
+#
+## LightGBM:
+#
+#rough_validate.better_model(grad_model, X_train_rand, Y_train_rand, grad_model_2, X_train_smote, Y_train_smote)
 
-# Logistic Regression: 
+# There is no difference between Random vs. SMOTE oversampling. 
+# As such we'll choose the models generated from random sampling for picking the best model
 
-rough_validate.better_model(trad_model, X_train_rand, Y_train_rand, trad_model_2, X_train_smote, Y_train_smote)
+rough_validate.better_model(trad_model, X_train_rand, Y_train_rand, grad_model, X_train_rand, Y_train_rand)
+rough_validate.better_model(trad_model, X_train_rand, Y_train_rand, mlp_model, X_train_rand, Y_train_rand)
+rough_validate.better_model(grad_model, X_train_rand, Y_train_rand, mlp_model, X_train_rand, Y_train_rand)
 
-# MLP:
-
-#rough_validate.better_model(mlp_test, X_train_rand, Y_train_rand, mlp_test_2, X_train_smote, Y_train_smote)
-
-# LightGBM:
-
-rough_validate.better_model(grad_model, X_train_rand, Y_train_rand, grad_model_2, X_train_smote, Y_train_smote)
+# There's no significant difference in performance between the three models? Idk what to do next lol

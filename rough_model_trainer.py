@@ -6,6 +6,14 @@ def logistic_classifier (x1, y1, x2, y2):
     model_2.fit(x2, y2)
     return(model_1, model_2)
 
+def tree_classifier(x1, y1, x2, y2):
+    from sklearn.ensemble import RandomForestClassifier
+    clf = RandomForestClassifier()
+    clf.fit(x1, y1)
+    clf2 = RandomForestClassifier()
+    clf.fit(x2, y2)
+    return(clf, clf2)
+
 def lgbt_classifier (x1, y1, x2, y2):
     import lightgbm as lgbt
     model_1 = lgbt.LGBMClassifier()

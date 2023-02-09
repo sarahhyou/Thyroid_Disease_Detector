@@ -29,23 +29,25 @@ def rough_preprocessor (x):
 # Because there is quite a number of data missing in each numerical column (100+ ~ 500+) 
 # I decided on using MICE (Multivariate Imputation by Chained Equation) based on a Bayesian Ridge model 
 # to maintain random variability and capture the relationship between thyroid hormone levels and age
+# normalize quantitative variables (except age):
     
     mice_imputer = IterativeImputer(estimator= linear_model.BayesianRidge(), n_nearest_features= None, imputation_order= 'ascending')
     x_num = pd.DataFrame(mice_imputer.fit_transform(x_num), columns = numerical_cols)
-    
+    cols_tonorm = ['TSH', 'T3', 'TT4', 'T4U', 'FTI']
+    x_num[cols_tonorm] = x_num[cols_tonorm].apply(lambda x: (x - x.median())/(x.quantile(0.75)-x.quantile(0.25)))
+
+# Add columns:
+   
 # Only a few data points were missing in the categorical columns
 # Considering that women are more at risk of thyroid issues than men, more women are likely to be surveyed for this dataset
     
     x_cat['sex'] = x_cat['sex'].fillna('F')
-
-# normalize quantitative variables (except age):
-
-    cols_tonorm = ['TSH','T3','TT4','T4U','FTI']
-    x_num[cols_tonorm] = x_num[cols_tonorm].apply(lambda x: (x - x.median())/(x.quantile(0.75)-x.quantile(0.25)))
     
 # Transform categorical variables
     
     x_cat_onehot = pd.get_dummies(x_cat, columns = categorical_cols)
+    x_cat_onehot['female_and_pregnant'] = x_cat_onehot['sex_F'] * x_cat_onehot['pregnant_t']
+    x_cat_onehot = x_cat_onehot.drop(['sex_M', 'pregnant_f', 'sick_f', 'tumor_f'], axis=1)
     
 # Join numerical and categorical sub dataframes together and overwrite original dataframe
     

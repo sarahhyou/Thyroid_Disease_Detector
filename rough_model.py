@@ -35,6 +35,9 @@ X_train, X_train_no_onehot, catcols = rough_preprocessor.rough_preprocessor(X_tr
 X_train_rand, Y_train_rand = rough_oversampler.rough_oversampler_random(X_train, Y_train)
 X_train_smote, Y_train_smote = rough_oversampler.rough_oversampler_smote(X_train_no_onehot, Y_train, catcols)
 
+print(X_train_rand.head())
+print(X_train_smote.head())
+
 # Preprocessing done! Time to model the datasets:
 # There are three general categories of classification models we can use: Traditional Classification, Artificial NN, and Gradient Boosting
 
@@ -62,14 +65,14 @@ grad_model, grad_model_2 = rough_model_trainer.lgbt_classifier(X_train_rand, Y_t
 
 # Model comparison:
 
-## Random oversampling vs. SMOTE oversampling (tested no difference):
-#
 import rough_validate
 
 X_val = rough_preprocessor.rough_preprocessor(X_val)[0]
 
-rough_validate.better_model(trad_model, X_val, Y_val, trad_model_2, X_val, Y_val)
+
+models = [trad_model, trad_model_2, grad_model, grad_model_2, forest_model, forest_model_2, mlp_model, mlp_model_2]
+print(rough_validate.comp_f1(models, X_val, Y_val)) # The best model is Random Forest Classifier with random oversampling
+
+# Hyperparameter Tuning:
 
 
-# There is no difference between Random vs. SMOTE oversampling. 
-# As such we'll choose the models generated from random sampling for picking the best model

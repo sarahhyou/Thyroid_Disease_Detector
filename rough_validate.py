@@ -36,5 +36,5 @@ def comp_f1(models, x_val, y_val):
     for i, j in enumerate(models):
         f1_scores[f1_score(y_val, j.predict(x_val))] = i
     max_f1 = max(f1_scores.keys())
-    return(models[f1_scores[max_f1]], max_f1)
+    return(f1_scores[max_f1], models[f1_scores[max_f1]], max_f1)
 

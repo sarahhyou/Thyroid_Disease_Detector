@@ -30,14 +30,10 @@ def mlp_classifier(x1, y1, x2, y2):
 
     # Create basic model:
 
-    x_numcols = len(x1.columns)
-
     def create_model():
       model = Sequential()
-      model.add(Dense(units=80,activation='relu'))
-      model.add(Dense(units=20,activation='relu'))
-      model.add(Dense(units=10,activation='relu'))
-      model.add(Dense(units=5,activation='relu'))
+      model.add(Dense(units=6,activation='relu'))
+      model.add(Dense(units=6,activation='relu'))
       model.add(Dense(units=1,activation='sigmoid'))
       model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
       return model

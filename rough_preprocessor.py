@@ -4,8 +4,6 @@ from sklearn.impute import IterativeImputer
 from sklearn import linear_model
 from imblearn.over_sampling import RandomOverSampler
 from imblearn.over_sampling import SMOTENC
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.compose import ColumnTransformer
 
 # ---------- Main Pipeline ----------
 def rough_preprocessor (x):
@@ -18,12 +16,14 @@ def rough_preprocessor (x):
 # Also helpful to remove columns related to antithyroid medication, surgery, and TBG to prevent data leakeage.
 
     x = x.drop(['TSH_measured','T3_measured','TT4_measured','T4U_measured','FTI_measured','TBG_measured', 'TBG', 
-'query_thyroxine', 'query_hyperthyroid', 'query_hypothyroid','antithyroid_meds', 'goitre','tumor'], axis= 1)
+'query_thyroxine', 'query_hyperthyroid', 'query_hypothyroid','antithyroid_meds','tumor',
+'lithium','sick','thyroxine','thyroid_surgery'], axis= 1)
 
 # Now we deal with columns with only partially missing data. First we replace `?` with np.NaN and correctly recast data types:
 
     x = x.replace('?',np.nan)
-    x[['age', 'TSH', 'T3', 'TT4', 'T4U','FTI']] = x[['age', 'TSH', 'T3', 'TT4', 'T4U','FTI']].apply(pd.to_numeric)
+    x[['age', 'TSH', 'T3', 'TT4', 'T4U','FTI']] = x[['age', 'TSH', 'T3', 'TT4', 'T4U','FTI']].apply(
+        pd.to_numeric, errors='coerce')
 
 # Then we split the reminaing dataset into categorical and numerical columns and use SimpleImputer to fill in missing numerical values
 
@@ -46,6 +46,20 @@ def rough_preprocessor (x):
 # Considering that women are more at risk of thyroid issues than men, more women are likely to be surveyed for this dataset
     
     x_cat['sex'] = x_cat['sex'].fillna('F')
+
+# EXPERIMENTAL: Bin age into "old" (>median) and "not old" category
+    med = x_num['age'].median()+0.01
+    x_cat['is_old'] = x_num['age'].apply(lambda x: 'not_old' if x <= med else 'old')
+
+    x_cat['is_old'].fillna(np.nan, inplace=True)
+    m1 = (x_cat['is_old'].isnull()) & (x_num['age'] <= med)
+    m2 = (x_cat['is_old'].isnull()) & (x_num['age'] > med)
+    x_cat.loc[m1, 'is_old'] = x_cat.loc[m1, 'is_old'].fillna('not_old', inplace=True)
+    x_cat.loc[m2, 'is_old'] = x_cat.loc[m2, 'is_old'].fillna('not_old', inplace=True)
+    # TODO: Can I figure out how to convert columns returning NaN
+    #x_cat['is_old'].fillna('unknown', inplace=True)
+    print(x_cat['is_old'].isnull().sum())
+    categorical_cols.append('is_old')
     
 # Join numerical and categorical sub dataframes together and overwrite original dataframe
     x_num.index = x_cat.index
@@ -78,3 +92,4 @@ def rough_oversampler_smote(x, y, cols):
     smote_os = SMOTENC(categorical_features= col_indices, random_state = 123, sampling_strategy= 0.5) # categorical data in last 4 columns 
     x_smote, y_smote = smote_os.fit_resample(x, y)
     return (x_smote, y_smote)
+

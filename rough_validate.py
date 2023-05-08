@@ -1,6 +1,5 @@
 from sklearn.metrics import f1_score
 from sklearn.model_selection import StratifiedKFold, cross_val_score
-from scipy.stats import wilcoxon
 
 #def rough_validate(x, y, model):
 #    predict = model.predict(x)

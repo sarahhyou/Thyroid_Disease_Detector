@@ -1,5 +1,5 @@
+#TODO: Why is there NaN in entries???
 import pandas as pd
-import numpy as np
 import warnings 
 
 warnings.filterwarnings("ignore")
@@ -33,6 +33,7 @@ X_train, X_val, Y_train, Y_val = train_test_split(X, Y, test_size = .3, random_s
 import rough_preprocessor
 categorical_cols = rough_preprocessor.rough_preprocessor(X_train)[1]
 X_train_rand, Y_train_rand, X_train_smote, Y_train_smote = rough_preprocessor.training_pipeline(X_train, Y_train, categorical_cols)
+#print(X_train_rand)
 
 # OnehotEncoder to convert categorical variables into dummy variables
 ohe = OneHotEncoder(categories='auto', drop=None, sparse= True, handle_unknown='ignore')
@@ -41,6 +42,8 @@ tf = ColumnTransformer(transformers=[('categorical', step, categorical_cols)], r
 
 X_train_rand = tf.fit_transform(X_train_rand)
 X_train_smote = tf.fit_transform(X_train_smote)
+
+#Add features
 
 # Time to model the datasets:
 # There are three general categories of classification models we can use: Traditional Classification, Artificial NN, and Gradient Boosting
